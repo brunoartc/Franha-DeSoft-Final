@@ -11,13 +11,18 @@ class Player:
 		self.y=tamy/2-59/2
 		self.projeteis=[]
 		self.projeteismax=2
-		self.vel=1
-		
+		self.vel=0.6
 class Projetil:
 	def __init__(self,x,y):
 		self.x=x
 		self.y=y
 		self.vel=2
+		
+class Obstaculo:
+	def __init__(self):
+		self.x=tamx
+		self.y=random.randint(0, tamy-59)
+		self.vel=0.6
 		
 	
 	
@@ -52,6 +57,7 @@ player = pygame.image.load("player1.png").convert_alpha()
 #obstaculo = pygame.image.load("pareda.jpg").convert_alpha()
 tecla = pygame.key.get_pressed()
 players=[]
+objetos=[Obstaculo()]
 def NewGame():
 	players.append(Player())
 	rola,x=0,0
@@ -67,6 +73,19 @@ def NewGame():
 			x+=1
 				
 		x=0
+		while x<len(objetos):
+			objetos[x].x-=objetos[x].vel
+			tela.blit(player, (objetos[x].x, objetos[x].y))
+			if objetos[-1].x<tamx/2:
+				objetos.append(Obstaculo())
+			if objetos[x].x>tamx:
+				del objetos[x]
+			if objetos[x].y<players[0].y and objetos[x].y+59>players[0].y and objetos[x].x+100>players[0].x and objetos[x].x<players[0].x:
+				print("teste")
+			x+=1
+			
+		x=0
+			
 		tela.blit(player, (players[0].x, players[0].y))
 		
 		
