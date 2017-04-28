@@ -5,10 +5,13 @@ import random
 rola=0
 tamx=987
 tamy=607
+
+tamplx=0
+tamply=59
 class Player:
 	def __init__(self):
 		self.x=0
-		self.y=tamy/2-59/2
+		self.y=tamy/2-tamply/2
 		self.projeteis=[]
 		self.projeteismax=2
 		self.vel=1
@@ -21,7 +24,7 @@ class Projetil:
 class Obstaculo:
 	def __init__(self):
 		self.x=tamx
-		self.y=random.randint(0, tamy-59)
+		self.y=random.randint(0, tamy-tamply)
 		self.vel=0.6
 		
 	
@@ -61,6 +64,14 @@ objetos=[Obstaculo()]
 def NewGame():
 	players.append(Player())
 	rola,x=0,0
+	tamx,tamy=987,607
+
+	tamplx=100
+	tamply=59
+	
+	tamblx=100
+	tambly=59
+	
 	while True:
 		press=pygame.key.get_pressed()
 		
@@ -80,11 +91,11 @@ def NewGame():
 				objetos.append(Obstaculo())
 			if objetos[x].x>tamx:
 				del objetos[x]
-			if objetos[x].y-59<players[0].y and objetos[x].y+59>players[0].y and objetos[x].x+100>players[0].x and objetos[x].x<players[0].x:
+			if objetos[x].y-tamply<players[0].y and objetos[x].y+tamply>players[0].y and objetos[x].x+tamplx>players[0].x and objetos[x].x-tamplx<players[0].x:
 				print("teste")
 			y=0
 			while y<len(players[0].projeteis):
-				if objetos[x].y-59<players[0].projeteis[y].y and objetos[x].y+59>players[0].projeteis[y].y and objetos[x].x+100>players[0].projeteis[y].x and objetos[x].x<players[0].projeteis[y].x:
+				if objetos[x].y-tambly<players[0].projeteis[y].y and objetos[x].y+tambly>players[0].projeteis[y].y and objetos[x].x+tamblx>players[0].projeteis[y].x and objetos[x].x-tamblx<players[0].projeteis[y].x:
 					print("teste123")
 				y+=1
 			x+=1
