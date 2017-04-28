@@ -13,7 +13,7 @@ class obstaculo:
 		self.x=987
 		self.yc=random.randint(-580,-200)
 		self.yb=self.yc+607+random.randint(120,190)
-		self.vel=1
+		self.vel=0.8
 		self.point=False
 		
 		
@@ -49,8 +49,8 @@ ara = pygame.image.load("a.png").convert_alpha()
 pare = pygame.image.load("pareda.jpg").convert()
 tecla = pygame.key.get_pressed()
 def NewGame():
-	cabron = personagem(1)
-	mexe=0.0
+	cabron = personagem(0.6)
+	mexe=0.2
 
 	pareda=[]
 	pareda.append(obstaculo())
@@ -61,7 +61,7 @@ def NewGame():
 	i=0
 	while True:
 		tela.blit(fundo, (mexe, 0))
-		mexe-=0.2
+		mexe-=0.1
 		if mexe<=-1934/2:
 		
 			mexe=0
