@@ -17,7 +17,7 @@ class obstaculo:
 		self.point=False
 		
 		
-def YouLose():
+def YouLose(placar):
 	tela = pygame.display.set_mode((987, 607), 0, 32)
 	pygame.display.set_caption('Franha')
 	tecla = pygame.key.get_pressed()
@@ -31,7 +31,7 @@ def YouLose():
 		else:
 			fundo = pygame.image.load("PERDEU.jpg").convert()
 			tela.blit(fundo,(0,0))
-			perdeu = fonte.render("'N' para novo jogo", 1, (255,255,0))
+			perdeu = fonte.render("'N' para novo jogo  Pontuacao:{}".format(placar), 1, (255,255,0))
 			tela.blit(perdeu,(250,100))
 			pygame.display.update()
 			
@@ -71,13 +71,13 @@ def NewGame():
 			tela.blit(pare, (pareda[i].x , pareda[i].yc))
 			tela.blit(pare, (pareda[i].x , pareda[i].yb))
 			if cabron.x+100> pareda[i].x and cabron.x< pareda[i].x+100:
-				if cabron.y<pareda[i].yb and cabron.y>pareda[i].yc+607:
+				if cabron.y+50<pareda[i].yb and cabron.y>pareda[i].yc+607:
 					if False==pareda[i].point:
 						placar+=1
 						pareda[i].point=True
-					print(placar)
+					#print(placar)
 				else:
-					YouLose()
+					YouLose(placar)
 				
 			if pareda[i].x<-97:
 				del pareda[i]
