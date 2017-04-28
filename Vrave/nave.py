@@ -59,11 +59,14 @@ def NewGame():
 		press=pygame.key.get_pressed()
 		
 		tela.blit(fundo, (rola, 0))
-		tela.blit(player, (players[0].x, players[0].y))
 		while x<len(projeteis):
+			projeteis[x].x+=projeteis[x].vel
 			tela.blit(player, (projeteis[x].x, projeteis[x].y))
 			x+=1
 		x=0
+		tela.blit(player, (players[0].x, players[0].y))
+		
+		
 		rola-=0.1
 		if rola<=-1934/2:
 			rola=0
