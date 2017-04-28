@@ -5,11 +5,12 @@ import random
 rola=0
 tamx=987
 tamy=607
-
 class Player:
 	def __init__(self):
 		self.x=0
 		self.y=tamy/2-59/2
+		self.projeteis=[]
+		self.projeteismax=2
 		self.vel=1
 		
 class Projetil:
@@ -51,7 +52,6 @@ player = pygame.image.load("player1.png").convert_alpha()
 #obstaculo = pygame.image.load("pareda.jpg").convert_alpha()
 tecla = pygame.key.get_pressed()
 players=[]
-projeteis=[]
 def NewGame():
 	players.append(Player())
 	rola,x=0,0
@@ -59,10 +59,13 @@ def NewGame():
 		press=pygame.key.get_pressed()
 		
 		tela.blit(fundo, (rola, 0))
-		while x<len(projeteis):
-			projeteis[x].x+=projeteis[x].vel
-			tela.blit(player, (projeteis[x].x, projeteis[x].y))
+		while x<len(players[0].projeteis) and len(players[0].projeteis)<=players[0].projeteismax:
+			players[0].projeteis[x].x+=players[0].projeteis[x].vel
+			tela.blit(player, (players[0].projeteis[x].x, players[0].projeteis[x].y))
+			if players[0].projeteis[x].x>tamx:
+				del players[0].projeteis[x]
 			x+=1
+				
 		x=0
 		tela.blit(player, (players[0].x, players[0].y))
 		
@@ -86,8 +89,9 @@ def NewGame():
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
-					projeteis.append(Projetil(players[0].x, players[0].y))
-					print(1)
+					if len(players[0].projeteis)<players[0].projeteismax:
+						players[0].projeteis.append(Projetil(players[0].x, players[0].y))
+					print(len(players[0].projeteis))
 			if event.type == QUIT:
 					exit()
 					
