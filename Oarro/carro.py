@@ -32,7 +32,7 @@ ara = pygame.image.load("carro.png").convert_alpha()
 pare = pygame.image.load("obstaculo.png").convert()
 tecla = pygame.key.get_pressed()
 def NewGame():
-	pnt=10
+	pnt=100
 	TED=carro(1)
 
 	obs=[]
@@ -53,7 +53,7 @@ def NewGame():
 			if obs[0].y >720:
 				del obs[0]
 				pnt+=1
-				TED.vel=1*int(pnt/10)
+				TED.vel=1*int(pnt/100)
 				print(TED.vel)
 			tela.blit(pare, (obs[i].x , obs[i].y))
 			if TED.pos==obs[i].pos and obs[i].y>720-164*2 and obs[i].y<720-134*2:
