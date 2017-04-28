@@ -11,7 +11,7 @@ class Player:
 		self.y=tamy/2-59/2
 		self.projeteis=[]
 		self.projeteismax=2
-		self.vel=0.6
+		self.vel=1
 class Projetil:
 	def __init__(self,x,y):
 		self.x=x
@@ -80,11 +80,17 @@ def NewGame():
 				objetos.append(Obstaculo())
 			if objetos[x].x>tamx:
 				del objetos[x]
-			if objetos[x].y<players[0].y and objetos[x].y+59>players[0].y and objetos[x].x+100>players[0].x and objetos[x].x<players[0].x:
+			if objetos[x].y-59<players[0].y and objetos[x].y+59>players[0].y and objetos[x].x+100>players[0].x and objetos[x].x<players[0].x:
 				print("teste")
+			y=0
+			while y<len(players[0].projeteis):
+				if objetos[x].y-59<players[0].projeteis[y].y and objetos[x].y+59>players[0].projeteis[y].y and objetos[x].x+100>players[0].projeteis[y].x and objetos[x].x<players[0].projeteis[y].x:
+					print("teste123")
+				y+=1
 			x+=1
 			
 		x=0
+
 			
 		tela.blit(player, (players[0].x, players[0].y))
 		
