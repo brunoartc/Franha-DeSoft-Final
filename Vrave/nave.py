@@ -3,11 +3,18 @@ import sys
 from pygame.locals import *
 import random
 rola=0
+
 tamx=987
 tamy=607
 
-tamplx=0
+tamplx=100
 tamply=59
+
+tampox=100
+tampoy=59
+placar= 0
+dific=10 # mais proximo de 0 mais dificil
+
 class Player:
 	def __init__(self):
 		self.x=0
@@ -15,6 +22,7 @@ class Player:
 		self.projeteis=[]
 		self.projeteismax=2
 		self.vel=1
+		self.vida=10
 class Projetil:
 	def __init__(self,x,y):
 		self.x=x
@@ -26,6 +34,7 @@ class Obstaculo:
 		self.x=tamx
 		self.y=random.randint(0, tamy-tamply)
 		self.vel=0.6
+		self.vida=random.randint(0, 2+(placar/dific))
 		
 	
 	
@@ -52,16 +61,23 @@ def YouLose(placar):
 	
 #sys.path.append('./data')
 pygame.font.init()
+pygame.mixer.init(frequency = 44100, size = -16, channels = 2, buffer = 2**12) 
 fonte = pygame.font.SysFont("monospace", 15)
 tela = pygame.display.set_mode((987, 607), 0, 32)
 pygame.display.set_caption('PewPew')
+musica=pygame.mixer.Sound(file="The_moon.ogg")
+laser=("laser.ogg")
 fundo = pygame.image.load("fundo.jpg").convert()
-player = pygame.image.load("player1.png").convert_alpha()
-#obstaculo = pygame.image.load("pareda.jpg").convert_alpha()
 tecla = pygame.key.get_pressed()
 players=[]
 objetos=[Obstaculo()]
+pygame.mixer.Channel(0).play(musica, -1)
+obstaculo = pygame.image.load("player1.png").convert_alpha()
+player = pygame.image.load("player1.png").convert_alpha()
+
+
 def NewGame():
+	placar=0
 	players.append(Player())
 	rola,x=0,0
 	tamx,tamy=987,607
@@ -69,10 +85,10 @@ def NewGame():
 	tamplx=100
 	tamply=59
 	
-	tamblx=100
-	tambly=59
-	
+	tampox=100
+	tampoy=59
 	while True:
+		
 		press=pygame.key.get_pressed()
 		
 		tela.blit(fundo, (rola, 0))
@@ -84,19 +100,33 @@ def NewGame():
 			x+=1
 				
 		x=0
+		if len(objetos)==0:
+			objetos.append(Obstaculo())
 		while x<len(objetos):
 			objetos[x].x-=objetos[x].vel
-			tela.blit(player, (objetos[x].x, objetos[x].y))
-			if objetos[-1].x<tamx/2:
+			tela.blit(obstaculo, (objetos[x].x, objetos[x].y))
+			if objetos[-1].x<tamx-tamx/4+(placar/dific):
 				objetos.append(Obstaculo())
-			if objetos[x].x>tamx:
+			if objetos[x].x<0-tampoy:
 				del objetos[x]
+				players[0].vida-=1
 			if objetos[x].y-tamply<players[0].y and objetos[x].y+tamply>players[0].y and objetos[x].x+tamplx>players[0].x and objetos[x].x-tamplx<players[0].x:
-				print("teste")
+				del objetos[x]
+				players[0].vida-=1
+				print("voce bateu, vida {}".format(players[0].vida))
 			y=0
+			
+			
+			
 			while y<len(players[0].projeteis):
-				if objetos[x].y-tambly<players[0].projeteis[y].y and objetos[x].y+tambly>players[0].projeteis[y].y and objetos[x].x+tamblx>players[0].projeteis[y].x and objetos[x].x-tamblx<players[0].projeteis[y].x:
-					print("teste123")
+				if objetos[x].y-tampoy<players[0].projeteis[y].y and objetos[x].y+tampoy>players[0].projeteis[y].y and objetos[x].x+tampox>players[0].projeteis[y].x and objetos[x].x-tampox<players[0].projeteis[y].x:
+					objetos[x].vida-=1
+					if objetos[x].vida<0:
+						del objetos[x]
+						placar+=1
+					del players[0].projeteis[y]
+					print("voce acertou, vida {}".format("-1"))
+					print("objstos {}".format(len(objetos)))
 				y+=1
 			x+=1
 			
@@ -104,6 +134,8 @@ def NewGame():
 
 			
 		tela.blit(player, (players[0].x, players[0].y))
+		perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+		tela.blit(perdeu,(250,100))
 		
 		
 		rola-=0.1
@@ -126,8 +158,11 @@ def NewGame():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
 					if len(players[0].projeteis)<players[0].projeteismax:
+						pygame.mixer.music.pause()
+						pygame.mixer.music.load(laser)
+						pygame.mixer.music.play(0)
 						players[0].projeteis.append(Projetil(players[0].x, players[0].y))
-					print(len(players[0].projeteis))
+					print("projeteis: {}".format(len(players[0].projeteis)))
 			if event.type == QUIT:
 					exit()
 					
