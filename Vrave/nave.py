@@ -4,43 +4,52 @@ from pygame.locals import *
 import random
 rola=0
 
-tamx=987
-tamy=607
+tamTEx=987
+tamTEy=607
 
-tamplx=100
-tamply=59
+tamplx=53
+tamply=43
 
-tampox=100
-tampoy=59
 placar= 0
 dific=10 # mais proximo de 0 mais dificil
 
 class Player:
 	def __init__(self):
 		self.x=0
-		self.y=tamy/2-tamply/2
+		self.y=tamTEy/2-tamply/2
 		self.projeteis=[]
 		self.projeteismax=2
 		self.vel=1
 		self.vida=10
 class Projetil:
-	def __init__(self,x,y):
+	def __init__(self,x,y,tamx=20,tamy=10):
 		self.x=x
 		self.y=y
 		self.vel=2
+		self.proj = pygame.image.load("tiro.png").convert_alpha()
+		self.tamx=tamx
+		self.tamy=tamy
 		
 class Obstaculo:
-	def __init__(self):
-		self.x=tamx
-		self.y=random.randint(0, tamy-tamply)
+	def __init__(self,tamx=100,tamy=59):
+		self.x=tamTEx
+		self.y=random.randint(0, tamTEy-tamy)
 		self.vel=0.6
 		self.vida=random.randint(0, 2+(placar/dific))
+		self.tamy=tamy
+		self.tamx=tamx
+		self.atingido=0
+		self.item=random.randint(1, 121)
+		if self.item<115:
+			self.tamx=20
+			self.tamy=10
+			self.item=0
 		
 	
 	
 	
 def YouLose(placar):
-	tela = pygame.display.set_mode((tamx, tamy), 0, 32)
+	tela = pygame.display.set_mode((tamTEx, tamTEy), 0, 32)
 	pygame.display.set_caption('Franha')
 	
 	while True:
@@ -67,26 +76,26 @@ tela = pygame.display.set_mode((987, 607), 0, 32)
 pygame.display.set_caption('PewPew')
 musica=pygame.mixer.Sound(file="The_moon.ogg")
 laser=("laser.ogg")
+acerto=("acerto.ogg")
 fundo = pygame.image.load("fundo.jpg").convert()
 tecla = pygame.key.get_pressed()
 players=[]
 objetos=[Obstaculo()]
 pygame.mixer.Channel(0).play(musica, -1)
 obstaculo = pygame.image.load("player1.png").convert_alpha()
-player = pygame.image.load("player1.png").convert_alpha()
+obstaculo1 = pygame.image.load("mais.png").convert_alpha()
+player = pygame.image.load("nave.png").convert_alpha()
 
 
 def NewGame():
 	placar=0
 	players.append(Player())
 	rola,x=0,0
-	tamx,tamy=987,607
+	tamTEx,tamTEy=987,607
 
-	tamplx=100
-	tamply=59
+	tamplx=53
+	tamply=43
 	
-	tampox=100
-	tampoy=59
 	while True:
 		
 		press=pygame.key.get_pressed()
@@ -94,8 +103,8 @@ def NewGame():
 		tela.blit(fundo, (rola, 0))
 		while x<len(players[0].projeteis) and len(players[0].projeteis)<=players[0].projeteismax:
 			players[0].projeteis[x].x+=players[0].projeteis[x].vel
-			tela.blit(player, (players[0].projeteis[x].x, players[0].projeteis[x].y))
-			if players[0].projeteis[x].x>tamx:
+			tela.blit(players[0].projeteis[x].proj, (players[0].projeteis[x].x, players[0].projeteis[x].y))
+			if players[0].projeteis[x].x>tamTEx:
 				del players[0].projeteis[x]
 			x+=1
 				
@@ -104,25 +113,43 @@ def NewGame():
 			objetos.append(Obstaculo())
 		while x<len(objetos):
 			objetos[x].x-=objetos[x].vel
-			tela.blit(obstaculo, (objetos[x].x, objetos[x].y))
-			if objetos[-1].x<tamx-tamx/4+(placar/dific):
+			if objetos[x].atingido<0:
+				if objetos[x].item==0:
+					tela.blit(obstaculo, (objetos[x].x, objetos[x].y))
+				elif objetos[x].item>0:
+					tela.blit(obstaculo1, (objetos[x].x, objetos[x].y))
+					
+					
+			objetos[x].atingido-=1
+			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific):
 				objetos.append(Obstaculo())
-			if objetos[x].x<0-tampoy:
+			if objetos[x].x<0-objetos[x].tamy:
 				del objetos[x]
 				players[0].vida-=1
-			if objetos[x].y-tamply<players[0].y and objetos[x].y+tamply>players[0].y and objetos[x].x+tamplx>players[0].x and objetos[x].x-tamplx<players[0].x:
-				del objetos[x]
-				players[0].vida-=1
-				print("voce bateu, vida {}".format(players[0].vida))
+			if objetos[x].y-tamply<players[0].y and objetos[x].y+objetos[x].tamy>players[0].y and objetos[x].x+objetos[x].tamx>players[0].x and objetos[x].x-tamplx<players[0].x:
+				if objetos[x].item>0:
+					del objetos[x]
+					players[0].projeteismax+=1
+					print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
+				else:
+					del objetos[x]
+					players[0].vida-=1
+					pygame.mixer.music.load(acerto)
+					pygame.mixer.music.play(0)
+					print("voce bateu, vida {}".format(players[0].vida))
 			y=0
 			
 			
 			
 			while y<len(players[0].projeteis):
-				if objetos[x].y-tampoy<players[0].projeteis[y].y and objetos[x].y+tampoy>players[0].projeteis[y].y and objetos[x].x+tampox>players[0].projeteis[y].x and objetos[x].x-tampox<players[0].projeteis[y].x:
+				if len(objetos)>0 and objetos[x].y-players[0].projeteis[y].tamy<players[0].projeteis[y].y and objetos[x].y+objetos[x].tamy>players[0].projeteis[y].y and objetos[x].x+objetos[x].tamx>players[0].projeteis[y].x and objetos[x].x-players[0].projeteis[y].tamx<players[0].projeteis[y].x:
 					objetos[x].vida-=1
+					objetos[x].atingido=10 #tempo apagado
 					if objetos[x].vida<0:
 						del objetos[x]
+						#pygame.mixer.music.pause()
+						pygame.mixer.music.load(acerto)
+						pygame.mixer.music.play(0)
 						placar+=1
 					del players[0].projeteis[y]
 					print("voce acertou, vida {}".format("-1"))
@@ -147,21 +174,21 @@ def NewGame():
 		
 		if press[K_UP] and players[0].y>0:
 			players[0].y-=players[0].vel
-		if press[K_DOWN] and players[0].y<tamy-59:
+		if press[K_DOWN] and players[0].y<tamTEy-59:
 			players[0].y+=players[0].vel
 		if press[K_LEFT] and players[0].x>0:
 			players[0].x-=players[0].vel
-		if press[K_RIGHT] and players[0].x<tamx-100:
+		if press[K_RIGHT] and players[0].x<tamTEx-100:
 			players[0].x+=players[0].vel
 			
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
 					if len(players[0].projeteis)<players[0].projeteismax:
-						pygame.mixer.music.pause()
+						#pygame.mixer.music.pause()
 						pygame.mixer.music.load(laser)
 						pygame.mixer.music.play(0)
-						players[0].projeteis.append(Projetil(players[0].x, players[0].y))
+						players[0].projeteis.append(Projetil(players[0].x, players[0].y+tamply/2))
 					print("projeteis: {}".format(len(players[0].projeteis)))
 			if event.type == QUIT:
 					exit()
