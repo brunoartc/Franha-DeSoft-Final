@@ -3,7 +3,6 @@ import sys
 from pygame.locals import *
 import random
 rola=0
-
 tamTEx=987
 tamTEy=607
 
@@ -40,9 +39,11 @@ class Obstaculo:
 		self.tamx=tamx
 		self.atingido=0
 		self.item=random.randint(1, 121)
+		self.tamx=20
+		self.tamy=10
 		if self.item<115:
-			self.tamx=20
-			self.tamy=10
+			self.tamx=100
+			self.tamy=59
 			self.item=0
 		
 	
@@ -88,6 +89,9 @@ player = pygame.image.load("nave.png").convert_alpha()
 
 
 def NewGame():
+	debgg=0
+	player = pygame.image.load("nave.png").convert_alpha()
+	cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 	placar=0
 	players.append(Player())
 	rola,x=0,0
@@ -118,28 +122,28 @@ def NewGame():
 					tela.blit(obstaculo, (objetos[x].x, objetos[x].y))
 				elif objetos[x].item>0:
 					tela.blit(obstaculo1, (objetos[x].x, objetos[x].y))
-					
-					
 			objetos[x].atingido-=1
 			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific):
 				objetos.append(Obstaculo())
 			if objetos[x].x<0-objetos[x].tamy:
 				del objetos[x]
 				players[0].vida-=1
-			if objetos[x].y-tamply<players[0].y and objetos[x].y+objetos[x].tamy>players[0].y and objetos[x].x+objetos[x].tamx>players[0].x and objetos[x].x-tamplx<players[0].x:
+			if objetos[x].y-tamply<players[0].y\
+			and objetos[x].y+objetos[x].tamy>players[0].y\
+			and objetos[x].x+objetos[x].tamx>players[0].x\
+			and objetos[x].x-tamplx<players[0].x:
+				if debgg==1: print(objetos[x].tamy, objetos[x].tamx)
 				if objetos[x].item>0:
 					del objetos[x]
 					players[0].projeteismax+=1
-					print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
+					if debgg==1: print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
 				else:
 					del objetos[x]
 					players[0].vida-=1
 					pygame.mixer.music.load(acerto)
 					pygame.mixer.music.play(0)
-					print("voce bateu, vida {}".format(players[0].vida))
+					if debgg==1: print("voce bateu, vida {}".format(players[0].vida))
 			y=0
-			
-			
 			
 			while y<len(players[0].projeteis):
 				if len(objetos)>0 and objetos[x].y-players[0].projeteis[y].tamy<players[0].projeteis[y].y and objetos[x].y+objetos[x].tamy>players[0].projeteis[y].y and objetos[x].x+objetos[x].tamx>players[0].projeteis[y].x and objetos[x].x-players[0].projeteis[y].tamx<players[0].projeteis[y].x:
@@ -147,19 +151,20 @@ def NewGame():
 					objetos[x].atingido=10 #tempo apagado
 					if objetos[x].vida<0:
 						del objetos[x]
+						x-=1
 						#pygame.mixer.music.pause()
 						pygame.mixer.music.load(acerto)
 						pygame.mixer.music.play(0)
 						placar+=1
 					del players[0].projeteis[y]
-					print("voce acertou, vida {}".format("-1"))
-					print("objstos {}".format(len(objetos)))
+					if debgg==1: print("voce acertou, vida {}".format("-1"))
+					if debgg==1: print("objstos {}".format(len(objetos)))
 				y+=1
 			x+=1
 			
-		x=0
-
-			
+		x=0	
+		
+		
 		tela.blit(player, (players[0].x, players[0].y))
 		perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
 		tela.blit(perdeu,(250,100))
@@ -188,8 +193,42 @@ def NewGame():
 						#pygame.mixer.music.pause()
 						pygame.mixer.music.load(laser)
 						pygame.mixer.music.play(0)
-						players[0].projeteis.append(Projetil(players[0].x, players[0].y+tamply/2))
-					print("projeteis: {}".format(len(players[0].projeteis)))
+						players[0].projeteis.append(Projetil(players[0].x, players[0].y+tamply/2))					
+						if debgg==1: print("projeteis: {}".format(len(players[0].projeteis)),players[0].projeteis[y].tamy,players[0].projeteis[y].tamx)
+				if event.key == pygame.K_UP and b==0:
+					cima+=1
+					if debgg==1: print("cima")
+				if event.key == pygame.K_DOWN and cima==2:
+					baixo+=1
+					if debgg==1: print("baixo")
+				if event.key == pygame.K_LEFT and baixo==2:
+					esquerda+=1
+					if debgg==1: print("e")
+				if event.key == pygame.K_RIGHT and esquerda==1:
+					direita+=1
+					if debgg==1: print("d")
+				if event.key == pygame.K_LEFT and direita==1 and esquerda==1:
+					esquerda+=1
+					if debgg==1: print("e")
+				if event.key == pygame.K_RIGHT and esquerda==2 :
+					direita+=1
+					if debgg==1: print("d")
+				if event.key == pygame.K_b and direita==2:
+					b+=1
+					if debgg==1: print("b")
+				if event.key == pygame.K_a and b==1:
+					if debgg==1: print("+100")
+					player = pygame.image.load("medfrighter.png").convert_alpha()
+					player=pygame.transform.rotate(player,90*3)
+					players[0].projeteismax+=100
+					debgg=1
+				if event.key == pygame.K_TAB:
+					cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
+					if debgg==1: print("TAB")
+				if cima>2 or a==1:
+					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
+						cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
+						if debgg==1: print("TAB")
 			if event.type == QUIT:
 					exit()
 					
