@@ -140,14 +140,14 @@ def NewGame():
 				print("x=",objetos[x].x,"y=",objetos[x].y)
 
 
-				if players[0].x+tamplx*1.01-random.random()*300<objetos[x].x:
+				if players[0].x+tamplx*1.01<objetos[x].x:
 					objetos[x].x-=objetos[x].vel
-				elif players[0].x+tamplx*1.01+random.random()*300>objetos[x].x:
+				elif players[0].x+tamplx*1.01>objetos[x].x:
 					objetos[x].x+=objetos[x].vel
-				if players[0].y-random.random()*300<objetos[x].y:
-					objetos[x].y-=objetos[x].vel
-				elif players[0].y+random.random()*300>objetos[x].y:
-					objetos[x].y+=objetos[x].vel
+				if players[0].y+random.random()*300<objetos[x].y:
+					objetos[x].y-=objetos[x].vel*1.5
+				elif players[0].y-random.random()*300>objetos[x].y:
+					objetos[x].y+=objetos[x].vel*1.5
 
 
 			if objetos[x].atingido<0:
