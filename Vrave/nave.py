@@ -30,9 +30,9 @@ class Projetil:
 		self.tamy=tamy
 		
 class Obstaculo:
-	def __init__(self,ai=0,tamx=100,tamy=59):
+	def __init__(self,ai=0,x=0,y=0,off=1,tamx=100,tamy=59):
 
-		self.img = pygame.image.load("mais.png").convert_alpha()
+		self.img = pygame.image.load("mais.png").convert_alpha() #imagem padrao #erro
 		self.x=tamTEx
 		self.y=random.randint(0, tamTEy-tamy)
 		self.vel=0.6
@@ -40,26 +40,47 @@ class Obstaculo:
 		self.tamy=tamy
 		self.tamx=tamx
 		self.atingido=0
-		self.item=random.randint(1, 121)
+		self.item=random.randint(1, 121) #item aleatorio
 		self.tamx=20
 		self.tamy=10
 		self.dano=0
 		self.ai=ai
+		self.offscreen=off
 
 
 		if ai==1:
-			self.img = pygame.image.load("player1.png").convert_alpha()
+			self.img = pygame.image.load("player1.png").convert_alpha() #boss
 			self.tamy=tamy
 			self.tamx=tamx
+			self.x=tamTEx-self.tamx
 			self.dano=100
 			self.vel=0.5
+			self.y=random.randint(0, tamTEy-tamy)
+			self.vai=0
+			self.ataque=0
+			self.tiros=0
+			
+		if ai==2:
+			self.img = pygame.image.load("player1.png").convert_alpha() #tiro do boss
+			self.tamy=tamy
+			self.tamx=tamx
+			self.x=x
+			self.dano=2
+			self.vel=2
+			self.y=y
+			self.vai=0
+			self.offscreen=0
+			
 
 		if self.item<115:
-			self.img = pygame.image.load("player1.png").convert_alpha()
+			self.img = pygame.image.load("player1.png").convert_alpha() #inimigo comum
 			self.tamx=100
 			self.tamy=59
 			self.item=0
 			self.dano=1
+			
+		if self.item==121:	#ou self.item<=121 and self.item>=119
+			self.img = pygame.image.load("mais.png").convert_alpha() #item 121 ou entre 119 e 121
 	
 	
 	
@@ -109,6 +130,8 @@ def NewGame():
 	players.append(Player())
 	rola,x=0,0
 	tamTEx,tamTEy=987,607
+	
+	chefe=0
 
 	tamplx=53
 	tamply=43
@@ -130,16 +153,41 @@ def NewGame():
 			x+=1
 				
 		x=0
-		if len(objetos)==0:
+		if len(objetos)==0 and chefe==0:
 			objetos.append(Obstaculo())
 		while x<len(objetos):
 			if objetos[x].ai!=1:
 				objetos[x].x-=objetos[x].vel
 			else:
+				chefe=1
 				print("chefe")
-				print("x=",objetos[x].x,"y=",objetos[x].y)
-
-
+				print("x=",objetos[x].x,"y=",objetos[x].y,"ataque",objetos[x].ataque,objetos[x].tiros)
+				if objetos[x].y<=tamTEy-objetos[x].tamy and objetos[x].vai==0:
+					objetos[x].y+=objetos[x].vel
+					if objetos[x].y>tamTEy-objetos[x].tamy:
+						objetos[x].vai=1
+				elif objetos[x].y>=0:
+					objetos[x].y-=objetos[x].vel
+					if objetos[x].y<0:
+						objetos[x].vai=0
+				
+				if objetos[x].y==players[0].y or objetos[x].alive>20: #o 20 random.randint(10,300+(placar/dific))
+					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
+					objetos[x].alive=0
+				if objetos[x].ataque>5000:
+					objetos[x].ataque=0 #random.randint(1,3000+3*(placar/dific))
+					objetos[x].tiros=100 #random.randint(1,200+3*(placar/dific))
+					objetos[x].ataque+=1
+				else:
+					objetos[x].ataque+=1
+					
+				if objetos[x].tiros>0:
+					if objetos[x].tiros%15==0: #random.randint(10,20+3*(placar/dific))
+						objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
+					
+					objetos[x].tiros-=1
+				objetos[x].alive+=1
+				'''AI teste de AI
 				if players[0].x+tamplx*1.01<objetos[x].x:
 					objetos[x].x-=objetos[x].vel
 				elif players[0].x+tamplx*1.01>objetos[x].x:
@@ -148,7 +196,7 @@ def NewGame():
 					objetos[x].y-=objetos[x].vel*1.5
 				elif players[0].y-random.random()*300>objetos[x].y:
 					objetos[x].y+=objetos[x].vel*1.5
-
+				'''
 
 			if objetos[x].atingido<0:
 				if objetos[x].item==0:
@@ -156,13 +204,15 @@ def NewGame():
 				elif objetos[x].item>0:
 					tela.blit(objetos[x].img, (objetos[x].x, objetos[x].y))
 			objetos[x].atingido-=1
-			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific):
+			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific) and chefe==0 :
 				objetos.append(Obstaculo())
-
-
 			if objetos[x].x<0-objetos[x].tamy:
+				
+				if objetos[x].offscreen!=0:
+					players[0].vida-=objetos[x].dano
 				del objetos[x]
-				players[0].vida-=objetos[x].dano
+				break
+				
 			if objetos[x].y-tamply<players[0].y\
 			and objetos[x].y+objetos[x].tamy>players[0].y\
 			and objetos[x].x+objetos[x].tamx>players[0].x\
@@ -173,8 +223,8 @@ def NewGame():
 					players[0].projeteismax+=1
 					if debgg==1: print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
 				else:
-					del objetos[x]
 					players[0].vida-=objetos[x].dano
+					del objetos[x]
 					pygame.mixer.music.load(acerto)
 					pygame.mixer.music.play(0)
 					if debgg==1: print("voce bateu, vida {}".format(players[0].vida))
@@ -184,6 +234,8 @@ def NewGame():
 					objetos[x].vida-=1
 					objetos[x].atingido=10 #tempo apagado
 					if objetos[x].vida<0:
+						if objetos[x].ai==1:
+							chefe=0
 						del objetos[x]
 						x-=1
 						#pygame.mixer.music.pause()
@@ -198,7 +250,10 @@ def NewGame():
 			
 		x=0	
 		tela.blit(player, (players[0].x, players[0].y))
-		perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+		if debgg==0: 
+			perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+		else:
+			perdeu = fonte.render("B = BOSS SPAWN BACKSP=OBJ SPAWN pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
 		tela.blit(perdeu,(250,100))
 		rola-=0.1
 		if rola<=-1934/2:
@@ -252,8 +307,11 @@ def NewGame():
 				if event.key == pygame.K_TAB:
 					cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 					if debgg==1: print("TAB")
-				if event.key == pygame.K_c:	
+				if event.key == pygame.K_b and debgg==1:	
 					objetos.append(Obstaculo(1))
+				if event.key == pygame.K_BACKSPACE and debgg==1:	
+					objetos.append(Obstaculo())
+					if debgg==1: print("PLUSSS")
 
 				if cima>2 or a==1:
 					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
