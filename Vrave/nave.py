@@ -2,6 +2,9 @@ import pygame
 import sys
 from pygame.locals import *
 import random
+from firebase import firebase
+
+
 rola=0
 tamTEx=987
 tamTEy=607
@@ -12,6 +15,10 @@ tamply=43
 placar= 0
 dific=10 # mais proximo de 0 mais dificil
 
+firebase = firebase.FirebaseApplication('https://pf-chubby.firebaseio.com/', None)
+def leaderboard():
+	result = firebase.get('/leaderboard', None)
+	print (result)
 class Player:
 	def __init__(self):
 		self.x=0
@@ -30,7 +37,9 @@ class Projetil:
 		self.tamy=tamy
 		
 class Obstaculo:
-	def __init__(self,tamx=100,tamy=59):
+	def __init__(self,ai=0,x=0,y=0,off=1,tamx=100,tamy=59):
+
+		self.img = pygame.image.load("mais.png").convert_alpha() #imagem padrao #erro
 		self.x=tamTEx
 		self.y=random.randint(0, tamTEy-tamy)
 		self.vel=0.6
@@ -38,14 +47,48 @@ class Obstaculo:
 		self.tamy=tamy
 		self.tamx=tamx
 		self.atingido=0
-		self.item=random.randint(1, 121)
+		self.item=random.randint(1, 121) #item aleatorio
 		self.tamx=20
 		self.tamy=10
+		self.dano=0
+		self.ai=ai
+		self.offscreen=off
+		self.alive=0
+
+
+		if ai==1:
+			self.img = pygame.image.load("player1.png").convert_alpha() #boss
+			self.tamy=tamy
+			self.tamx=tamx
+			self.x=tamTEx-self.tamx
+			self.dano=100
+			self.vel=0.5
+			self.y=random.randint(0, tamTEy-tamy)
+			self.vai=0
+			self.ataque=0
+			self.tiros=0
+			
+		if ai==2:
+			self.img = pygame.image.load("player1.png").convert_alpha() #tiro do boss
+			self.tamy=tamy
+			self.tamx=tamx
+			self.x=x
+			self.dano=2
+			self.vel=2
+			self.y=y
+			self.vai=0
+			self.offscreen=0
+			
+
 		if self.item<115:
+			self.img = pygame.image.load("player1.png").convert_alpha() #inimigo comum
 			self.tamx=100
 			self.tamy=59
 			self.item=0
-		
+			self.dano=1
+			
+		if self.item==121:	#ou self.item<=121 and self.item>=119
+			self.img = pygame.image.load("mais.png").convert_alpha() #item 121 ou entre 119 e 121
 	
 	
 	
@@ -83,19 +126,20 @@ tecla = pygame.key.get_pressed()
 players=[]
 objetos=[Obstaculo()]
 pygame.mixer.Channel(0).play(musica, -1)
-obstaculo = pygame.image.load("player1.png").convert_alpha()
-obstaculo1 = pygame.image.load("mais.png").convert_alpha()
 player = pygame.image.load("nave.png").convert_alpha()
 
 
 def NewGame():
-	debgg=0
+	clock = pygame.time.Clock()
+	debgg=1
 	player = pygame.image.load("nave.png").convert_alpha()
 	cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 	placar=0
 	players.append(Player())
 	rola,x=0,0
 	tamTEx,tamTEy=987,607
+	
+	chefe=0
 
 	tamplx=53
 	tamply=43
@@ -103,6 +147,10 @@ def NewGame():
 	while True:
 		
 		press=pygame.key.get_pressed()
+
+
+		if placar%100==0 and placar!=0:
+			objetos.append(Obstaculo(1))
 		
 		tela.blit(fundo, (rola, 0))
 		while x<len(players[0].projeteis) and len(players[0].projeteis)<=players[0].projeteismax:
@@ -113,17 +161,41 @@ def NewGame():
 			x+=1
 				
 		x=0
-		if len(objetos)==0:
+		if len(objetos)==0 and chefe==0:
 			objetos.append(Obstaculo())
 		while x<len(objetos):
-<<<<<<< HEAD
 			if objetos[x].ai!=1:
 				objetos[x].x-=objetos[x].vel
 			else:
+				chefe=1
 				print("chefe")
-				print("x=",objetos[x].x,"y=",objetos[x].y)
-
-
+				print("x=",objetos[x].x,"y=",objetos[x].y,"ataque",objetos[x].ataque,objetos[x].tiros)
+				if objetos[x].y<=tamTEy-objetos[x].tamy and objetos[x].vai==0:
+					objetos[x].y+=objetos[x].vel
+					if objetos[x].y>tamTEy-objetos[x].tamy:
+						objetos[x].vai=1
+				elif objetos[x].y>=0:
+					objetos[x].y-=objetos[x].vel
+					if objetos[x].y<0:
+						objetos[x].vai=0
+				
+				if objetos[x].y==players[0].y or objetos[x].alive>1000: #o 20 random.randint(10,300+(placar/dific))
+					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
+					objetos[x].alive=0
+				if objetos[x].ataque>5000:
+					objetos[x].ataque=0 #random.randint(1,3000+3*(placar/dific))
+					objetos[x].tiros=100 #random.randint(1,200+3*(placar/dific))
+					objetos[x].ataque+=1
+				else:
+					objetos[x].ataque+=1
+					
+				if objetos[x].tiros>0:
+					if objetos[x].tiros%15==0: #random.randint(10,20+3*(placar/dific))
+						objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
+					
+					objetos[x].tiros-=1
+				objetos[x].alive+=1
+				'''AI teste de AI
 				if players[0].x+tamplx*1.01<objetos[x].x:
 					objetos[x].x-=objetos[x].vel
 				elif players[0].x+tamplx*1.01>objetos[x].x:
@@ -132,22 +204,23 @@ def NewGame():
 					objetos[x].y-=objetos[x].vel*1.5
 				elif players[0].y-random.random()*300>objetos[x].y:
 					objetos[x].y+=objetos[x].vel*1.5
+				'''
 
-
-=======
-			objetos[x].x-=objetos[x].vel
->>>>>>> parent of e9f1017... V 0.33
 			if objetos[x].atingido<0:
 				if objetos[x].item==0:
-					tela.blit(obstaculo, (objetos[x].x, objetos[x].y))
+					tela.blit(objetos[x].img, (objetos[x].x, objetos[x].y))
 				elif objetos[x].item>0:
-					tela.blit(obstaculo1, (objetos[x].x, objetos[x].y))
+					tela.blit(objetos[x].img, (objetos[x].x, objetos[x].y))
 			objetos[x].atingido-=1
-			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific):
+			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific) and chefe==0 :
 				objetos.append(Obstaculo())
 			if objetos[x].x<0-objetos[x].tamy:
+				
+				if objetos[x].offscreen!=0:
+					players[0].vida-=objetos[x].dano
 				del objetos[x]
-				players[0].vida-=1
+				break
+				
 			if objetos[x].y-tamply<players[0].y\
 			and objetos[x].y+objetos[x].tamy>players[0].y\
 			and objetos[x].x+objetos[x].tamx>players[0].x\
@@ -158,18 +231,19 @@ def NewGame():
 					players[0].projeteismax+=1
 					if debgg==1: print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
 				else:
+					players[0].vida-=objetos[x].dano
 					del objetos[x]
-					players[0].vida-=1
 					pygame.mixer.music.load(acerto)
 					pygame.mixer.music.play(0)
 					if debgg==1: print("voce bateu, vida {}".format(players[0].vida))
 			y=0
-			
 			while y<len(players[0].projeteis):
 				if len(objetos)>0 and objetos[x].y-players[0].projeteis[y].tamy<players[0].projeteis[y].y and objetos[x].y+objetos[x].tamy>players[0].projeteis[y].y and objetos[x].x+objetos[x].tamx>players[0].projeteis[y].x and objetos[x].x-players[0].projeteis[y].tamx<players[0].projeteis[y].x:
 					objetos[x].vida-=1
 					objetos[x].atingido=10 #tempo apagado
 					if objetos[x].vida<0:
+						if objetos[x].ai==1:
+							chefe=0
 						del objetos[x]
 						x-=1
 						#pygame.mixer.music.pause()
@@ -183,20 +257,15 @@ def NewGame():
 			x+=1
 			
 		x=0	
-		
-		
 		tela.blit(player, (players[0].x, players[0].y))
-		perdeu = fonte.render("Score = {}  vidas restantes: {}".format(placar,players[0].vida), 1, (255,255,0))
+		if debgg==0: 
+			perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+		else:
+			perdeu = fonte.render("B = BOSS SPAWN BACKSP=OBJ SPAWN pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
 		tela.blit(perdeu,(250,100))
-		
-		
 		rola-=0.1
 		if rola<=-1934/2:
 			rola=0
-		
-		
-		
-		
 		if press[K_UP] and players[0].y>0:
 			players[0].y-=players[0].vel
 		if press[K_DOWN] and players[0].y<tamTEy-59:
@@ -241,16 +310,28 @@ def NewGame():
 					player = pygame.image.load("medfrighter.png").convert_alpha()
 					player=pygame.transform.rotate(player,90*3)
 					players[0].projeteismax+=100
+					players[0].vida+=100
 					debgg=1
 				if event.key == pygame.K_TAB:
 					cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 					if debgg==1: print("TAB")
+				if event.key == pygame.K_b and debgg==1:	
+					objetos.append(Obstaculo(1))
+				if event.key == pygame.K_BACKSPACE and debgg==1:	
+					objetos.append(Obstaculo())
+					if debgg==1: print("PLUSSS")
+				if event.key == pygame.K_l and debgg==1:	
+					leaderboard()
+					firebase.post('/leaderboard',{"Orange":666})
+					if debgg==1: print("leade")
+
 				if cima>2 or a==1:
 					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
 						cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 						if debgg==1: print("TAB")
 			if event.type == QUIT:
 					exit()
-					
+					pygame.quit()
 		pygame.display.update()
+		clock.tick(200)
 NewGame()
