@@ -198,7 +198,7 @@ def NewGame():
 			
 		x=0	
 		tela.blit(player, (players[0].x, players[0].y))
-		perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+		perdeu = fonte.render("Score = {}  vidas restantes: {}".format(placar,players[0].vida), 1, (255,255,0))
 		tela.blit(perdeu,(250,100))
 		rola-=0.1
 		if rola<=-1934/2:
