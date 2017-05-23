@@ -3,6 +3,7 @@ import sys
 from pygame.locals import *
 import random
 from firebase import firebase
+import time
 
 
 rola=0
@@ -54,7 +55,8 @@ class Obstaculo:
 		self.ai=ai
 		self.offscreen=off
 		self.alive=0
-
+		self.ataque=0
+		self.tiros=0
 
 		if ai==1:
 			self.img = pygame.image.load("player1.png").convert_alpha() #boss
@@ -78,6 +80,17 @@ class Obstaculo:
 			self.y=y
 			self.vai=0
 			self.offscreen=0
+
+		if ai==3:
+			self.img = pygame.image.load("mais.png").convert_alpha() #tiro do boss com mira
+			self.tamy=tamy
+			self.tamx=tamx
+			self.x=x
+			self.dano=2
+			self.vel=2
+			self.y=y
+			self.vai=0
+			self.offscreen=0
 			
 
 		if self.item<115:
@@ -89,6 +102,10 @@ class Obstaculo:
 			
 		if self.item==121:	#ou self.item<=121 and self.item>=119
 			self.img = pygame.image.load("mais.png").convert_alpha() #item 121 ou entre 119 e 121
+
+
+		#if self.item<115:
+		#	self.img = pygame.image.load("vel_mais.png").convert_alpha() #inimigo comum
 	
 	
 	
@@ -113,25 +130,26 @@ def YouLose(placar):
 	return None
 	
 #sys.path.append('./data')
-pygame.font.init()
-pygame.mixer.init(frequency = 44100, size = -16, channels = 2, buffer = 2**12) 
-fonte = pygame.font.SysFont("monospace", 15)
-tela = pygame.display.set_mode((987, 607), 0, 32)
-pygame.display.set_caption('PewPew')
-musica=pygame.mixer.Sound(file="The_moon.ogg")
-laser=("laser.ogg")
-acerto=("acerto.ogg")
-fundo = pygame.image.load("fundo.jpg").convert()
-tecla = pygame.key.get_pressed()
-players=[]
-objetos=[Obstaculo()]
-pygame.mixer.Channel(0).play(musica, -1)
-player = pygame.image.load("nave.png").convert_alpha()
+
 
 
 def NewGame():
+	pygame.font.init()
+	pygame.mixer.init(frequency = 44100, size = -16, channels = 2, buffer = 2**12) 
+	fonte = pygame.font.SysFont("monospace", 15)
+	tela = pygame.display.set_mode((987, 607), 0, 32)
+	pygame.display.set_caption('PewPew')
+	musica=pygame.mixer.Sound(file="The_moon.ogg")
+	laser=("laser.ogg")
+	acerto=("acerto.ogg")
+	fundo = pygame.image.load("fundo.jpg").convert()
+	tecla = pygame.key.get_pressed()
+	players=[]
+	objetos=[Obstaculo()]
+	pygame.mixer.Channel(0).play(musica, -1)
+	player = pygame.image.load("nave.png").convert_alpha()
 	clock = pygame.time.Clock()
-	debgg=1
+	debgg=0
 	player = pygame.image.load("nave.png").convert_alpha()
 	cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 	placar=0
@@ -164,12 +182,25 @@ def NewGame():
 		if len(objetos)==0 and chefe==0:
 			objetos.append(Obstaculo())
 		while x<len(objetos):
-			if objetos[x].ai!=1:
+			if objetos[x].ai==0:
 				objetos[x].x-=objetos[x].vel
-			else:
+
+			elif objetos[x].ai==3: #tiro que segue 
+				if debgg==1: print("Tiro que segue")
+				#if players[0].x+tamplx*1.01<objetos[x].x:
+				objetos[x].x-=objetos[x].vel
+				#elif players[0].x+tamplx*1.01>objetos[x].x:
+				#	objetos[x].x+=objetos[x].vel
+				if players[0].y+random.random()*300<objetos[x].y:
+					objetos[x].y-=objetos[x].vel*1.5
+				elif players[0].y-random.random()*300>objetos[x].y:
+					objetos[x].y+=objetos[x].vel*1.5
+
+
+			elif objetos[x].ai==1:
 				chefe=1
-				print("chefe")
-				print("x=",objetos[x].x,"y=",objetos[x].y,"ataque",objetos[x].ataque,objetos[x].tiros)
+				if debgg==1: print("chefe")
+				if debgg==1: print("x=",objetos[x].x,"y=",objetos[x].y,"ataque",objetos[x].ataque,objetos[x].tiros)
 				if objetos[x].y<=tamTEy-objetos[x].tamy and objetos[x].vai==0:
 					objetos[x].y+=objetos[x].vel
 					if objetos[x].y>tamTEy-objetos[x].tamy:
@@ -182,7 +213,13 @@ def NewGame():
 				if objetos[x].y==players[0].y or objetos[x].alive>1000: #o 20 random.randint(10,300+(placar/dific))
 					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
 					objetos[x].alive=0
-				if objetos[x].ataque>5000:
+
+				if objetos[x].ataque%1000==1:
+					if debgg==1: print("tri legal")
+					#time.sleep(1)
+					objetos.append(Obstaculo(3,objetos[x].x,objetos[x].y))
+
+				if objetos[x].ataque>3000:
 					objetos[x].ataque=0 #random.randint(1,3000+3*(placar/dific))
 					objetos[x].tiros=100 #random.randint(1,200+3*(placar/dific))
 					objetos[x].ataque+=1
@@ -195,16 +232,6 @@ def NewGame():
 					
 					objetos[x].tiros-=1
 				objetos[x].alive+=1
-				'''AI teste de AI
-				if players[0].x+tamplx*1.01<objetos[x].x:
-					objetos[x].x-=objetos[x].vel
-				elif players[0].x+tamplx*1.01>objetos[x].x:
-					objetos[x].x+=objetos[x].vel
-				if players[0].y+random.random()*300<objetos[x].y:
-					objetos[x].y-=objetos[x].vel*1.5
-				elif players[0].y-random.random()*300>objetos[x].y:
-					objetos[x].y+=objetos[x].vel*1.5
-				'''
 
 			if objetos[x].atingido<0:
 				if objetos[x].item==0:
@@ -226,10 +253,24 @@ def NewGame():
 			and objetos[x].x+objetos[x].tamx>players[0].x\
 			and objetos[x].x-tamplx<players[0].x:
 				if debgg==1: print(objetos[x].tamy, objetos[x].tamx)
-				if objetos[x].item>0:
+
+
+
+
+				if objetos[x].item>0: #utilidade dos itens
 					del objetos[x]
 					players[0].projeteismax+=1
 					if debgg==1: print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
+				
+
+				elif objetos[x].item>=1:
+					del objetos[x]
+					players[0].vel+=1
+					if debgg==1: print("voce bateu, velocidade aumentada em 1x e vida {}".format(players[0].vida))
+
+
+
+
 				else:
 					players[0].vida-=objetos[x].dano
 					del objetos[x]
@@ -276,6 +317,11 @@ def NewGame():
 			players[0].x+=players[0].vel
 			
 		for event in pygame.event.get():
+			if event.type == QUIT:
+				pygame.quit()
+				pygame.exit()
+				exit()
+
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
 					if len(players[0].projeteis)<players[0].projeteismax:
@@ -329,9 +375,7 @@ def NewGame():
 					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
 						cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 						if debgg==1: print("TAB")
-			if event.type == QUIT:
-					exit()
-					pygame.quit()
+			
+					
 		pygame.display.update()
 		clock.tick(200)
-NewGame()
