@@ -19,7 +19,7 @@ dific=10 # mais proximo de 0 mais dificil
 firebase = firebase.FirebaseApplication('https://pf-chubby.firebaseio.com/', None)
 def leaderboard():
 	result = firebase.get('/leaderboard', None)
-	print (result)
+	return result
 class Player:
 	def __init__(self):
 		self.x=0
@@ -104,8 +104,8 @@ class Obstaculo:
 			self.img = pygame.image.load("mais.png").convert_alpha() #item 121 ou entre 119 e 121
 
 
-		#if self.item<115:
-		#	self.img = pygame.image.load("vel_mais.png").convert_alpha() #inimigo comum
+		if self.item>119 and self.item<121:
+			self.img = pygame.image.load("vel_mais.png").convert_alpha() #inimigo comum
 	
 	
 	
@@ -147,10 +147,10 @@ def NewGame():
 	players=[]
 	objetos=[Obstaculo()]
 	pygame.mixer.Channel(0).play(musica, -1)
-	player = pygame.image.load("nave.png").convert_alpha()
+	player = pygame.image.load("a-29.png").convert_alpha()
 	clock = pygame.time.Clock()
 	debgg=0
-	player = pygame.image.load("nave.png").convert_alpha()
+	player = pygame.image.load("a-29.png").convert_alpha()
 	cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 	placar=0
 	players.append(Player())
@@ -263,7 +263,7 @@ def NewGame():
 					if debgg==1: print("voce bateu, projeteis maximos aumentados em 1 e vida {}".format(players[0].vida))
 				
 
-				elif objetos[x].item>=1:
+				elif objetos[x].item==1:
 					del objetos[x]
 					players[0].vel+=1
 					if debgg==1: print("voce bateu, velocidade aumentada em 1x e vida {}".format(players[0].vida))
@@ -375,7 +375,8 @@ def NewGame():
 					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
 						cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 						if debgg==1: print("TAB")
-			
-					
+		#if Player[0].vida<=0:
+		#	break
+		#	YouLose()	
 		pygame.display.update()
 		clock.tick(200)
