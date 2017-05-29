@@ -71,7 +71,7 @@ class Obstaculo:
 			self.tiros=0
 			
 		if ai==2:
-			self.img = pygame.image.load("player1.png").convert_alpha() #tiro do boss
+			self.img = pygame.image.load("tiro_inimigo.png").convert_alpha() #tiro do boss
 			self.tamy=tamy
 			self.tamx=tamx
 			self.x=x
