@@ -5,8 +5,8 @@ import random
 from firebase import firebase
 import time
 
-musicas=["","portal.ogg"]
-imagens={"tiro":["tiro_inimigo.png","tiro_limão.jpg"],"skin":["","glados.png"],"tamanhop":["","glados.png"],"tamanhot":["","glados.png"]}
+
+imagens={"tiro":["tiro_inimigo.png","tiro_limao.png","missil1.png","especial do booss.png","tiro que segue do bossssssssssss.png"],"skin":["","glados.png","skinnn do bossssss"],"tamanhop":[[1,1],[75,108],["tamanho x do boss","tamanho y do boss"]],"tamanhot":[[1,1],[40,20],["tamanho x do tiro do boss","tamanho y do boss"]],"tamanhott":[[1,1],[60,100]],"inimigo normal":["inimigo1.png","inimigo2.png"]}
 rola=0
 tamTEx=987
 tamTEy=607
@@ -30,7 +30,7 @@ class Player:
 		self.vel=1
 		self.vida=10
 class Projetil:
-	def __init__(self,x,y,tamx=20,tamy=10):
+	def __init__(self,x,y,tamx=40,tamy=20):
 		self.x=x
 		self.y=y
 		self.vel=2
@@ -45,7 +45,7 @@ class Obstaculo:
 		self.x=tamTEx
 		self.y=random.randint(0, tamTEy-tamy)
 		self.vel=0.6
-		self.vida=random.randint(0, 2+(placar/dific))
+		self.vida=random.randint(1, 2+(placar/dific))
 		self.tamy=tamy
 		self.tamx=tamx
 		self.atingido=0
@@ -61,8 +61,10 @@ class Obstaculo:
 
 		if ai==1:
 			 #boss
-			self.tamy=tamy
-			self.tamx=tamx
+			self.vida=random.randint(7, 20+(placar/dific))
+			print(imagens["tamanhop"][theme])
+			self.tamy=imagens["tamanhop"][theme+1][0]
+			self.tamx=imagens["tamanhop"][theme+1][1]
 			self.x=tamTEx-self.tamx
 			self.dano=100
 			self.vel=0.5
@@ -78,46 +80,67 @@ class Obstaculo:
 			
 		elif ai==2:
 			self.img = pygame.image.load(imagens["tiro"][self.theme]).convert_alpha() #tiro do boss
-			self.tamy=tamy
-			self.tamx=tamx
+			self.tamy=imagens["tamanhott"][theme][0]
+			self.tamx=imagens["tamanhott"][theme][1]
 			self.x=x
 			self.dano=2
-			self.vel=2
+			self.vel=2 + self.theme
 			self.y=y
 			self.vai=0
 			self.offscreen=0
 
 		elif ai==3:
-			self.img = pygame.image.load("tiro_inimigo.png").convert_alpha() #tiro do boss com mira
-			self.tamy=tamy
-			self.tamx=tamx
+			self.img = pygame.image.load(imagens["tiro"][self.theme+1]).convert_alpha() #tiro do boss com mira
+			self.tamy=imagens["tamanhot"][theme][0]
+			self.tamx=imagens["tamanhot"][theme][1]
 			self.x=x
 			self.dano=2
-			self.vel=2
+			self.vel=3
 			self.y=y
 			self.vai=0
 			self.offscreen=0
 			
 
 		elif self.item<80:
-			self.img = pygame.image.load("player1.png").convert_alpha() #inimigo comum
-			self.tamx=100
-			self.tamy=59
+			self.img = pygame.image.load(imagens["inimigo normal"][self.vida%2]).convert_alpha() #inimigo comum
+			self.tamx=60
+			self.tamy=60
 			self.item=0
 			self.dano=1
 			
-		elif self.item>=80 and self.item<90:
+		elif self.item>=80 and self.item<85:
+			self.tamx=40
+			self.tamy=20
 			self.offscreen=0
 			self.item=1
 			self.dano=0
-			self.img = pygame.image.load("missil_mais.png").convert_alpha() #inimigo comum
+			self.img = pygame.image.load("missil_mais.png").convert_alpha() #missel mais
+
+		elif self.item>=85 and self.item<90:
+			self.offscreen=0
+			self.tamx=40
+			self.tamy=20
+			self.item=4
+			self.dano=0
+			self.img = pygame.image.load("missil_menos.png").convert_alpha() #inimigo comum
 			
-		elif self.item>=90 and self.item<100:
+		elif self.item>=90 and self.item<95:
 			print ("item2")
+			self.tamx=40
+			self.tamy=20
 			self.item=2
 			self.dano=0
 			self.offscreen=0
 			self.img = pygame.image.load("mais_vel.png").convert_alpha() #item fast
+
+		elif self.item>=95 and self.item<100:
+			print ("item2")
+			self.tamx=40
+			self.tamy=20
+			self.item=3
+			self.dano=0
+			self.offscreen=0
+			self.img = pygame.image.load("vel_menos.png").convert_alpha() #item fast
 			
 	
 	
@@ -168,18 +191,19 @@ def NewGame():
 	placar=0
 	players.append(Player())
 	rola,x=0,0
-	tamTEx,tamtiro_inimigoTEy=987,607
+	tamTEx,tamTEy=987,607
 	
 	chefe=0
 
 	tamplx=60
 	tamply=25
-	fundos=[pygame.image.load("cave3.jpg").convert(),pygame.image.load("cave3.jpg").convert()]
+	fundos=[pygame.image.load("cave3.jpg").convert(),pygame.image.load("cave3.jpg").convert(),]
+	musicas=["","portal.ogg",]
 	while True:
 		press=pygame.key.get_pressed()
 
 
-		if placar%100==0 and placar!=0:
+		if placar%20==0 and placar!=0:
 			objetos.append(Obstaculo(1))
 		
 		if chefe==0: 
@@ -218,10 +242,13 @@ def NewGame():
 				chefe=objetos[x].theme
 				if debgg==1: print("chefe")
 				if debgg==1: print("x=",objetos[x].x,"y=",objetos[x].y,"ataque",objetos[x].ataque,objetos[x].tiros)
+				
+
 				if objetos[x].y<=tamTEy-objetos[x].tamy and objetos[x].vai==-1:
 					objetos[x].y+=objetos[x].vel
 					if objetos[x].y>tamTEy-objetos[x].tamy:
 						objetos[x].vai=1
+				
 				elif objetos[x].y>=0:
 					objetos[x].y-=objetos[x].vel
 					if objetos[x].y<0:
@@ -232,8 +259,11 @@ def NewGame():
 						objetos[x].vai=objetos[x].vai*-1
 				else:
 					objetos[x].aipass=0
-				if objetos[x].y==players[0].y or objetos[x].alive%random.randint(100,200)==0: #o 20 random.randint(10,300+(placar/dific))
-					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y))
+				
+
+
+				if objetos[x].y==players[0].y or objetos[x].alive%random.randint(30,100)==0: #o 20 random.randint(10,300+(placar/dific))
+					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y)) #tiro normal boss
 					objetos[x].alive=0
 
 				if objetos[x].ataque%1000==1:
@@ -290,6 +320,15 @@ def NewGame():
 					players[0].vel+=0.25
 					if debgg==1: print("voce bateu, velocidade aumentada em 0.25x e vida {}".format(players[0].vida))
 
+				elif objetos[x].item==3:
+					del objetos[x]
+					players[0].vel-=0.25
+					if debgg==1: print("voce bateu, velocidade aumentada em 0.25x e vida {}".format(players[0].vida))
+
+				elif objetos[x].item==4:
+					del objetos[x]
+					players[0].projeteismax-=1	
+					if debgg==1: print("voce bateu, velocidade aumentada em 0.25x e vida {}".format(players[0].vida))
 
 
 				else:
@@ -402,3 +441,4 @@ def NewGame():
 		#	YouLose()	
 		pygame.display.update()
 		clock.tick(200)
+NewGame()
