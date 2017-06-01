@@ -6,7 +6,7 @@ from firebase import firebase
 import time
 
 musicas=["","portal.ogg"]
-imagens={"tiro":["tiro_inimigo.png","gladost.jpg"],"skin":["","glados.jpg"],"tamanhop":["","glados.jpg"],"tamanhot":["","glados.jpg"]}
+imagens={"tiro":["tiro_inimigo.png","tiro_limão.jpg"],"skin":["","glados.png"],"tamanhop":["","glados.png"],"tamanhot":["","glados.png"]}
 rola=0
 tamTEx=987
 tamTEy=607
@@ -34,7 +34,7 @@ class Projetil:
 		self.x=x
 		self.y=y
 		self.vel=2
-		self.proj = pygame.image.load("tiro.png").convert_alpha()
+		self.proj = pygame.image.load("missil1.png").convert_alpha()
 		self.tamx=tamx
 		self.tamy=tamy
 		
@@ -88,7 +88,7 @@ class Obstaculo:
 			self.offscreen=0
 
 		elif ai==3:
-			self.img = pygame.image.load("mais.png").convert_alpha() #tiro do boss com mira
+			self.img = pygame.image.load("tiro_inimigo.png").convert_alpha() #tiro do boss com mira
 			self.tamy=tamy
 			self.tamx=tamx
 			self.x=x
@@ -110,14 +110,14 @@ class Obstaculo:
 			self.offscreen=0
 			self.item=1
 			self.dano=0
-			self.img = pygame.image.load("mais.png").convert_alpha() #inimigo comum
+			self.img = pygame.image.load("missil_mais.png").convert_alpha() #inimigo comum
 			
 		elif self.item>=90 and self.item<100:
 			print ("item2")
 			self.item=2
 			self.dano=0
 			self.offscreen=0
-			self.img = pygame.image.load("tiro_inimigo.png").convert_alpha() #item fast
+			self.img = pygame.image.load("mais_vel.png").convert_alpha() #item fast
 			
 	
 	
@@ -168,7 +168,7 @@ def NewGame():
 	placar=0
 	players.append(Player())
 	rola,x=0,0
-	tamTEx,tamTEy=987,607
+	tamTEx,tamtiro_inimigoTEy=987,607
 	
 	chefe=0
 
@@ -287,9 +287,8 @@ def NewGame():
 
 				elif objetos[x].item==2:
 					del objetos[x]
-					players[0].vel+=1
-					if debgg==1: print("voce bateu, velocidade aumentada em 1x e vida {}".format(players[0].vida))
-
+					players[0].vel+=0.25
+					if debgg==1: print("voce bateu, velocidade aumentada em 0.25x e vida {}".format(players[0].vida))
 
 
 
@@ -323,7 +322,7 @@ def NewGame():
 		x=0	
 		tela.blit(player, (players[0].x, players[0].y))
 		if debgg==0: 
-			perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
+			perdeu = fonte.render("pontuacao{}, vida{}".format(placar,players[0].vida, font="ARIEL"), 1, (255,255,0))
 		else:
 			perdeu = fonte.render("B = BOSS SPAWN BACKSP=OBJ SPAWN pontuacao{}, vida{}".format(placar,players[0].vida), 1, (255,255,0))
 		tela.blit(perdeu,(250,100))
@@ -403,4 +402,3 @@ def NewGame():
 		#	YouLose()	
 		pygame.display.update()
 		clock.tick(200)
-NewGame()
