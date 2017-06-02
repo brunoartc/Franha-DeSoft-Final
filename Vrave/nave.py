@@ -188,7 +188,7 @@ def NewGame():
 	tecla = pygame.key.get_pressed()
 	players=[]
 	objetos=[Obstaculo()]
-	pygame.mixer.Channel(0).play(musica, -1)
+	pygame.mixer.Channel(2).play(musica, -1)
 	player = pygame.image.load("a-29.png").convert_alpha()
 	clock = pygame.time.Clock()
 	debgg=0
@@ -211,7 +211,7 @@ def NewGame():
 		if placar%(10+int(placar/dific))==0 and placar!=0 and cont>200 and chefe==0:
 			cont=0
 			print ("cont = {} e chefe={}".format(cont,chefe))
-			pygame.mixer.Channel(1).play(musicas[1],0)
+			pygame.mixer.Channel(2).play(musicas[1],0)
 		if cont<=200 and chefe==0:
 			if chefe==0 and cont>=200:
 			
@@ -219,7 +219,7 @@ def NewGame():
 					
 				objetos.append(Obstaculo(1))
 				chefe=objetos[-1].theme 
-				pygame.mixer.Channel(0).play(musicas[chefe-1], -1)
+				pygame.mixer.Channel(2).play(musicas[chefe-1], -1)
 				cont+=1
 			print ("cont = {} e chefe={}".format(cont,chefe))
 			cont+=1
