@@ -198,12 +198,12 @@ def NewGame():
 	while True:
 		press=pygame.key.get_pressed()
 
-		if placar%(10+int(placar/dific))==0 and placar!=0 and cont>100 and chefe==0:
+		if placar%(10+int(placar/dific))==0 and placar!=0 and cont>200 and chefe==0:
 			cont=0
 			print ("cont = {} e chefe={}".format(cont,chefe))
 			pygame.mixer.Channel(1).play(musicas[1],0)
-		if cont<=100 and chefe==0:
-			if chefe==0 and cont>=100:
+		if cont<=200 and chefe==0:
+			if chefe==0 and cont>=200:
 			
 				objetos=[]
 					
