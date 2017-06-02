@@ -193,21 +193,29 @@ def NewGame():
 	tamTEx,tamTEy=987,607
 	
 	chefe=0
-
+	cont=999
 	tamplx=60
 	tamply=25
-	fundos=[pygame.image.load("cave3.jpg").convert(),pygame.image.load("cave3.jpg").convert(),]
-	musicas=[pygame.mixer.Sound(file="portal.ogg"),pygame.mixer.Sound(file="portal.ogg"),]
+	fundos=[pygame.image.load("fundo_glados.png").convert(),pygame.image.load("fundo_glados.png").convert(),]
+	musicas=[pygame.mixer.Sound(file="portal.ogg"),pygame.mixer.Sound(file="intro_boss.ogg"),]
 	while True:
 		press=pygame.key.get_pressed()
 
-
-		if placar%20==0 and placar!=0:
-			objetos=[]
-				
-			objetos.append(Obstaculo(1))
-			chefe=objetos[-1].theme 
-			pygame.mixer.Channel(0).play(musicas[chefe], -1)
+		if placar%(10+int(placar/dific))==0 and placar!=0 and cont>100 and chefe==0:
+			cont=0
+			print ("cont = {} e chefe={}".format(cont,chefe))
+			pygame.mixer.Channel(1).play(musicas[1],0)
+		if cont<=100 and chefe==0:
+			if chefe==0 and cont>=100:
+			
+				objetos=[]
+					
+				objetos.append(Obstaculo(1))
+				chefe=objetos[-1].theme 
+				pygame.mixer.Channel(0).play(musicas[chefe-1], -1)
+				cont+=1
+			print ("cont = {} e chefe={}".format(cont,chefe))
+			cont+=1
 		
 		if chefe==0: 
 			tela.blit(fundo, (rola, 0))
@@ -269,12 +277,12 @@ def NewGame():
 					objetos.append(Obstaculo(2,objetos[x].x,objetos[x].y)) #tiro normal boss
 					objetos[x].alive=0
 
-				if objetos[x].ataque%1000==1:
+				if objetos[x].ataque%random.randint(200-placar*5,1000)==1:
 					if debgg==1: print("tri legal")
 					#time.sleep(1)
 					objetos.append(Obstaculo(3,objetos[x].x,objetos[x].y,objetos[x].theme))
 
-				if objetos[x].ataque>objetos[x].theme*1300:
+				if objetos[x].ataque>objetos[x].theme*1250:
 					objetos[x].ataque=0 #random.randint(1,3000+3*(placar/dific))
 					objetos[x].tiros=100 #random.randint(1,200+3*(placar/dific))
 					objetos[x].ataque+=1
