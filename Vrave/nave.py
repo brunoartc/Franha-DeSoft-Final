@@ -142,21 +142,31 @@ class Obstaculo:
 			self.img = pygame.image.load("vel_menos.png").convert_alpha() #item fast	
 	
 def YouLose(placar):
+	j=1
+	pygame.font.init()
 	tela = pygame.display.set_mode((tamTEx, tamTEy), 0, 32)
 	pygame.display.set_caption('Franha')
+	fonte = pygame.font.SysFont("monospace", 15)
 	
 	while True:
 		for event in pygame.event.get():
 			if event.type == QUIT:
-					exit()
+				pygame.quit()
+				pygame.exit()
+				exit()
 		tecla = pygame.key.get_pressed()
 		if tecla[K_n]:
 			NewGame()
 		else:
-			fundo = pygame.image.load("PERDEU.jpg").convert()
-			tela.blit(fundo,(0,0))
-			perdeu = fonte.render("'N' para novo jogo  Pontuacao:{}".format(placar), 1, (255,255,0))
-			tela.blit(perdeu,(250,100))
+			perdeu = fonte.render("VOCE PERDEU:'N' para novo jogo  Pontuacao:{}".format(placar), 1, (255,255,0))
+			tela.blit(perdeu,(0,0))
+			lea=leaderboard()
+			perdeu = fonte.render("LEADERBOARD", 1, (255,255,0))
+			tela.blit(perdeu,(20+20*j,30))
+			print(lea)
+			perdeu = fonte.render("{}".format(lea), 1, (255,255,0))
+			tela.blit(perdeu,(20*j,30))
+			j=+1
 			pygame.display.update()
 			
 	return None
@@ -447,9 +457,9 @@ def NewGame():
 					if event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_UP or event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_DOWN:
 						cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 						if debgg==1: print("TAB")
-		#if Player[0].vida<=0:
-		#	break
-		#	YouLose()	
+		if players[0].vida<=0:
+			#break
+			YouLose(placar)	
 		pygame.display.update()
 		clock.tick(200)
 NewGame()
