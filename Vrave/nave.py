@@ -181,14 +181,14 @@ def NewGame():
 	fonte = pygame.font.SysFont("monospace", 15)
 	tela = pygame.display.set_mode((987, 607), 0, 32)
 	pygame.display.set_caption('PewPew')
-	#musica=pygame.mixer.Sound(file="The_moon.ogg")
+	musica=pygame.mixer.Sound(file="The_moon.ogg")
 	laser=pygame.mixer.Sound(file="tiro.ogg")
 	acerto=pygame.mixer.Sound(file="acerto.ogg")
 	fundo = pygame.image.load("fundo.jpg").convert()
 	tecla = pygame.key.get_pressed()
 	players=[]
 	objetos=[Obstaculo()]
-	#pygame.mixer.Channel(0).play(musica, -1)
+	pygame.mixer.Channel(0).play(musica, -1)
 	player = pygame.image.load("a-29.png").convert_alpha()
 	clock = pygame.time.Clock()
 	debgg=0
@@ -462,4 +462,3 @@ def NewGame():
 			YouLose(placar)	
 		pygame.display.update()
 		clock.tick(200)
-NewGame()
