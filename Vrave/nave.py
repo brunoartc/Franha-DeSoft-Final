@@ -301,7 +301,7 @@ def NewGame():
 			objetos[x].atingido-=1
 			if objetos[-1].x<tamTEx-tamTEx/4+(placar/dific) and chefe==0 :
 				objetos.append(Obstaculo())
-			if objetos[x].x<0-objetos[x].tamy:
+			if objetos[x].x<0-objetos[x].tamx:
 				
 				if objetos[x].offscreen!=0:
 					players[0].vida-=objetos[x].dano
@@ -376,12 +376,17 @@ def NewGame():
 			rola=0
 		if press[K_UP] and players[0].y>0:
 			players[0].y-=players[0].vel
-		if press[K_DOWN] and players[0].y<tamTEy-59:
+		if press[K_DOWN] and players[0].y<tamTEy-tamply:
 			players[0].y+=players[0].vel
 		if press[K_LEFT] and players[0].x>0:
 			players[0].x-=players[0].vel
-		if press[K_RIGHT] and players[0].x<tamTEx-100:
-			players[0].x+=players[0].vel
+			
+		if chefe>0:
+			if press[K_RIGHT] and players[0].x<tamTEx-109:
+				players[0].x+=players[0].vel
+		else:
+			if press[K_RIGHT] and players[0].x<tamTEx-tamplx:
+				players[0].x+=players[0].vel
 			
 		for event in pygame.event.get():
 			if event.type == QUIT:
