@@ -103,8 +103,8 @@ class Obstaculo:
 
 		elif self.item<80:
 			self.img = pygame.image.load(imagens["inimigo normal"][self.vida%2]).convert_alpha() #inimigo comum
-			self.tamx=60
-			self.tamy=60
+			self.tamx=100
+			self.tamy=40
 			self.item=0
 			self.dano=1
 			
@@ -140,10 +140,7 @@ class Obstaculo:
 			self.item=3
 			self.dano=0
 			self.offscreen=0
-			self.img = pygame.image.load("vel_menos.png").convert_alpha() #item fast
-			
-	
-	
+			self.img = pygame.image.load("vel_menos.png").convert_alpha() #item fast	
 	
 def YouLose(placar):
 	tela = pygame.display.set_mode((tamTEx, tamTEy), 0, 32)
