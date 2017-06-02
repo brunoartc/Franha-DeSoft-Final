@@ -6,7 +6,7 @@ from firebase import firebase
 import time
 
 
-imagens={"tiro":["tiro_inimigo.png","tiro_limao.png","missil1.png","especial do booss.png","tiro que segue do bossssssssssss.png"],"skin":["","glados.png","skinnn do bossssss"],"tamanhop":[[1,1],[75,108],["tamanho x do boss","tamanho y do boss"]],"tamanhot":[[1,1],[40,20],["tamanho x do tiro do boss","tamanho y do boss"]],"tamanhott":[[1,1],[60,100]],"inimigo normal":["inimigo1.png","inimigo2.png"]}
+imagens={"tiro":["tiro_inimigo.png","tiro_limao.png","missil1.png","esp_dilma.png","seguidor.png"],"skin":["","glados.png","dilma_boss"],"tamanhop":[[1,1],[75,108],[75,108]],"tamanhot":[[1,1],[40,20],[40,20]],"tamanhott":[[1,1],[60,100]],"inimigo normal":["inimigo1.png","inimigo2.png"]}
 rola=0
 tamTEx=987
 tamTEy=607
