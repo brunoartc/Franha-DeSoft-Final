@@ -60,7 +60,7 @@ class Obstaculo:
 		self.tiros=0
 
 		if ai==1:
-			 #boss
+			#boss
 			self.vida=random.randint(7, 20+(placar/dific))
 			print(imagens["tamanhop"][theme])
 			self.tamy=imagens["tamanhop"][theme+1][0]
@@ -74,7 +74,6 @@ class Obstaculo:
 			self.tiros=0
 			self.theme=random.randint(1,1)
 			self.img = pygame.image.load(imagens["skin"][self.theme]).convert_alpha()
-			pygame.mixer.Channel(0).play(pygame.mixer.Sound(file=musicas[self.theme]), -1)
 			self.aipass=0
 			
 			
@@ -175,14 +174,14 @@ def NewGame():
 	fonte = pygame.font.SysFont("monospace", 15)
 	tela = pygame.display.set_mode((987, 607), 0, 32)
 	pygame.display.set_caption('PewPew')
-	musica=pygame.mixer.Sound(file="The_moon.ogg")
-	laser=("laser.ogg")
-	acerto=("acerto.ogg")
+	#musica=pygame.mixer.Sound(file="The_moon.ogg")
+	laser=pygame.mixer.Sound(file="tiro.ogg")
+	acerto=pygame.mixer.Sound(file="acerto.ogg")
 	fundo = pygame.image.load("fundo.jpg").convert()
 	tecla = pygame.key.get_pressed()
 	players=[]
 	objetos=[Obstaculo()]
-	pygame.mixer.Channel(0).play(musica, -1)
+	#pygame.mixer.Channel(0).play(musica, -1)
 	player = pygame.image.load("a-29.png").convert_alpha()
 	clock = pygame.time.Clock()
 	debgg=0
@@ -198,13 +197,17 @@ def NewGame():
 	tamplx=60
 	tamply=25
 	fundos=[pygame.image.load("cave3.jpg").convert(),pygame.image.load("cave3.jpg").convert(),]
-	musicas=["","portal.ogg",]
+	musicas=[pygame.mixer.Sound(file="portal.ogg"),pygame.mixer.Sound(file="portal.ogg"),]
 	while True:
 		press=pygame.key.get_pressed()
 
 
 		if placar%20==0 and placar!=0:
+			objetos=[]
+				
 			objetos.append(Obstaculo(1))
+			chefe=objetos[-1].theme 
+			pygame.mixer.Channel(0).play(musicas[chefe], -1)
 		
 		if chefe==0: 
 			tela.blit(fundo, (rola, 0))
@@ -334,8 +337,7 @@ def NewGame():
 				else:
 					players[0].vida-=objetos[x].dano
 					del objetos[x]
-					pygame.mixer.music.load(acerto)
-					pygame.mixer.music.play(0)
+					pygame.mixer.Channel(1).play(acerto, 0)
 					if debgg==1: print("voce bateu, vida {}".format(players[0].vida))
 			y=0
 			while y<len(players[0].projeteis):
@@ -345,12 +347,11 @@ def NewGame():
 					if objetos[x].vida<0:
 						if objetos[x].ai==1:
 							chefe=0
-							pygame.mixer.Channel(0).play(musica, -1)
+							pygame.mixer.Channel(0).play(acerto, 0)
 						del objetos[x]
 						x-=1
 						#pygame.mixer.music.pause()
-						pygame.mixer.music.load(acerto)
-						pygame.mixer.music.play(0)
+						pygame.mixer.Channel(0).play(acerto, 0)
 						placar+=1
 					del players[0].projeteis[y]
 					if debgg==1: print("voce acertou, vida {}".format("-1"))
@@ -387,8 +388,7 @@ def NewGame():
 				if event.key == pygame.K_SPACE:
 					if len(players[0].projeteis)<players[0].projeteismax:
 						#pygame.mixer.music.pause()
-						pygame.mixer.music.load(laser)
-						pygame.mixer.music.play(0)
+						pygame.mixer.Channel(0).play(laser, 0)
 						players[0].projeteis.append(Projetil(players[0].x, players[0].y+tamply/2))					
 						if debgg==1: print("projeteis: {}".format(len(players[0].projeteis)),players[0].projeteis[y].tamy,players[0].projeteis[y].tamx, tamply/2)
 				if event.key == pygame.K_UP and b==0:
@@ -422,7 +422,8 @@ def NewGame():
 				if event.key == pygame.K_TAB:
 					cima,baixo,esquerda,direita,b,a=0,0,0,0,0,0
 					if debgg==1: print("TAB")
-				if event.key == pygame.K_b and debgg==1:	
+				if event.key == pygame.K_t and debgg==1:
+					pygame.mixer.Channel(0).play(musicas[chefe], -1)				
 					objetos.append(Obstaculo(1))
 				if event.key == pygame.K_BACKSPACE and debgg==1:	
 					objetos.append(Obstaculo())
